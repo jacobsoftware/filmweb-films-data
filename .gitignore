@@ -1,0 +1,6 @@
+__pycache__
+*.txt
+test.py
+keys.json
+*.db
+filmweb_db.db
