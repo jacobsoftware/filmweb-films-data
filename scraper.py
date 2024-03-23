@@ -77,6 +77,7 @@ def parse_html(results):
     list_of_data = []
     for html_text in results:
         try: tree = html.fromstring(html_text)
+        # Skip current record cuz doesn't exist
         except: continue
     # Cover section
         # Title
@@ -91,7 +92,8 @@ def parse_html(results):
         # Duration
         if film_cover_section.xpath('//div[@class="filmCoverSection__duration"]'):
             film_duration = film_cover_section.xpath('//div[@class="filmCoverSection__duration"]/@data-duration')[0]
-        else: film_duration = 0
+        # Skip record beacause probably film was never released
+        else: continue
 
     # Preview content
         if tree.xpath('//div[@class="page__container filmCoverSection__ratings afterPremiere"]'):
@@ -112,8 +114,10 @@ def parse_html(results):
     # Poster section
         film_poster_section = tree.xpath('//div[@class="filmPosterSection__info filmInfo"]')[0]
         # Director
-        directors = film_poster_section.xpath('//div[@class="filmInfo__info cloneToCast cloneToOtherInfo"][1]/a/span/text()')
-        film_director = loop_items(directors)
+        if film_poster_section.xpath('//div[@class="filmInfo__info cloneToCast cloneToOtherInfo"][1]/a/span'):
+            directors = film_poster_section.xpath('//div[@class="filmInfo__info cloneToCast cloneToOtherInfo"][1]/a/span/text()')
+            film_director = loop_items(directors)
+        else: film_director = None
         # Writer
         if film_poster_section.xpath('//div[@class="filmInfo__info cloneToCast cloneToOtherInfo"][2]/a/span'):
             writers = film_poster_section.xpath('//div[@class="filmInfo__info cloneToCast cloneToOtherInfo"][2]/a/span/text()')
@@ -127,8 +131,10 @@ def parse_html(results):
         film_country_production = loop_items(countries)
 
         # Actors
-        actors = tree.xpath('//div[@class="Crs crs crs--limited crs--roundedNavigation"]/div//a/h3/text()')
-        film_actors = loop_items(actors)
+        if tree.xpath('//div[@class="Crs crs crs--limited crs--roundedNavigation"]/div//a/h3'):
+            actors = tree.xpath('//div[@class="Crs crs crs--limited crs--roundedNavigation"]/div//a/h3/text()')
+            film_actors = loop_items(actors)
+        else: film_actors = None
 
         # Studio
         if tree.xpath('//div[@class="filmOtherInfoSection__content"]//div[@class="filmInfo__group filmInfo__group--studios"]/div[@class="filmInfo__info"]'):
@@ -155,7 +161,7 @@ def parse_html(results):
                 film_country_production, film_duration, film_actors, film_rating, film_votes, current_date]
         list_of_data.append(data)
         #pprint.pprint(data)
-    save_data(list_of_data,CREATE_HREF_TABLE,INSERT_INTO_HREF_TABLE)
+    save_data(list_of_data,CREATE_FILM_DATA_TABLE,INSERT_INTO_FILM_DATA_TABLE)
         
 def loop_items(items: list) -> str:
     extracted_data = ''
@@ -186,7 +192,7 @@ if __name__ == '__main__':
     x = 27999
     while x < len(urlx):
 
-        get_href = f'SELECT film_url FROM href_table WHERE itemID > {x} AND itemID <= {x+500}'
+        get_href = f'SELECT film_url FROM href_table WHERE itemID > {x} AND itemID <= {x+500} ORDER BY year_production DESC'
         urls = load_urls(get_href)
         results = []
         results = asyncio.run(go(urls))

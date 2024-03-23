@@ -6,23 +6,23 @@ INSERT_INTO_HREF_TABLE = 'INSERT INTO href_table (film_title, film_url, year_pro
 READ_HREFS = f'SELECT film_url FROM href_table'
 
 
-CREATE_HREF_TABLE = '''CREATE TABLE IF NOT EXISTS film_data( itemID INTEGER PRIMARY KEY, 
-                    film_title TEXT, 
-                    film_title_eng TEXT, 
-                    year_production INTEGER, 
-                    director TEXT, 
-                    writer TEXT,
-                    studio TEXT, 
-                    film_genre TEXT,
-                    country_production TEXT,
-                    duration INTEGER, 
-                    actors TEXT,
-                    rating REAL, 
-                    votes INTEGER,
-                    date_of_scrape TEXT)'''
+CREATE_FILM_DATA_TABLE = '''CREATE TABLE IF NOT EXISTS film_data( itemID INTEGER PRIMARY KEY, 
+                        film_title TEXT, 
+                        film_title_eng TEXT, 
+                        year_production INTEGER, 
+                        director TEXT, 
+                        writer TEXT,
+                        studio TEXT, 
+                        film_genre TEXT,
+                        country_production TEXT,
+                        duration INTEGER, 
+                        actors TEXT,
+                        rating REAL, 
+                        votes INTEGER,
+                        date_of_scrape TEXT)'''
 
 
-INSERT_INTO_HREF_TABLE = '''INSERT INTO film_data (film_title, film_title_eng, year_production, 
+INSERT_INTO_FILM_DATA_TABLE = '''INSERT INTO film_data (film_title, film_title_eng, year_production, 
                             director, writer, studio, film_genre, country_production, duration, actors, 
                             rating, votes, date_of_scrape) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)'''
 
@@ -50,6 +50,8 @@ def load_data(table_read: str) -> None:
     cursor.execute(sqlQueryReadTable)
     items = cursor.fetchall()
     return items
+
+
 
 
 
